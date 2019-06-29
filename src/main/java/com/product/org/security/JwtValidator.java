@@ -3,11 +3,11 @@ package com.product.org.security;
 import com.product.org.model.JwtUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Component;
 
-@Component
 public class JwtValidator {
-    public JwtUser validate(String token) {
+
+
+    public static JwtUser validate(String token) {
         JwtUser jwtuser = new JwtUser();
         try {
             String signingKey = "achuth";
@@ -20,4 +20,5 @@ public class JwtValidator {
         }
         return jwtuser;
     }
+
 }

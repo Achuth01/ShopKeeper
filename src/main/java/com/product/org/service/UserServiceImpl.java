@@ -21,9 +21,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean registerUser(User user) {
         if(userRepository.doUserNameExist(user.getUserName()))
-            throw new RuntimeException("user name already exists");
+            throw new RuntimeException("User name already exists");
         if(userRepository.doEmailExist(user.getEmail()))
-            throw new RuntimeException("email already exists");
+            throw new RuntimeException("Email already exists");
         try{
             userRepository.addUser(user);
             return true;

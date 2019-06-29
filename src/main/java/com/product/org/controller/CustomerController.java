@@ -18,7 +18,7 @@ public class CustomerController {
     }
 
     @PostMapping(value = "/customerDetails/add")
-    private CustomerDetails addCustomerDetails(@RequestBody  CustomerDetails customerDetails){
+    private CustomerDetails addCustomerDetails(@RequestBody  CustomerDetails customerDetails) throws Exception {
         return customerService.add(customerDetails);
     }
 }

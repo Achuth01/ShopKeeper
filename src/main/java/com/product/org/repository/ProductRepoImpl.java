@@ -8,7 +8,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -60,12 +62,14 @@ public class ProductRepoImpl extends SimpleJpaRepository<Product,Integer> implem
     }
 
     @Override
-    public Product getByNumber(String number) {
+    public Product getByNumber(String number,String userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root<Product> root = cq.from(Product.class);
         cq.select(root);
-        cq.where(cb.equal(root.get("productSerialNumber"), number));
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("productSerialNumber"), number));
+        predicates.add(cb.equal(root.get("createdBy"), userId));
         try {
             return (Product) entityManager.createQuery(cq).getSingleResult();
         } catch(NoResultException e){

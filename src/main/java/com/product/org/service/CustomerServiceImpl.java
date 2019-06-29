@@ -1,9 +1,13 @@
 package com.product.org.service;
 
 import com.product.org.model.CustomerDetails;
+import com.product.org.model.JwtAuthenticationToken;
 import com.product.org.model.Product;
+import com.product.org.model.ProductsPurchased;
 import com.product.org.repository.CustomerRepo;
 import com.product.org.repository.ProductRepo;
+import com.product.org.security.JwtAuthenticationProvider;
+import com.product.org.security.JwtValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +27,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Transactional
     @Override
-    public CustomerDetails add(CustomerDetails customerDetails) {
-        customerDetails.getProductsPurchasedList().stream().forEach(productsPurchased -> {
+    public CustomerDetails add(CustomerDetails customerDetails) throws Exception {
+        for(ProductsPurchased productsPurchased:customerDetails.getProductsPurchasedList()){
             productsPurchased.setId(null);
             productsPurchased.setItemPrice(productsPurchased.getPrice()*productsPurchased.getQuantitiesSold());
             productsPurchased.setCustomerDetails(customerDetails);
-            Product product=productRepo.getByNumber(productsPurchased.getProductSerialNumber());
+            Product product=productRepo.getByNumber(productsPurchased.getProductSerialNumber(), JwtValidator.validate(JwtAuthenticationToken.getToken()).getUserId());
+            if(product.getQuantity()<productsPurchased.getQuantitiesSold())
+                throw new Exception("Maximum of " + product.getQuantity() + " " + product.getProductName() + " available");
             product.setQuantity(product.getQuantity()-productsPurchased.getQuantitiesSold());
             productRepo.update(product);
-        });
+        }
         customerDetails.setInvoiceNumber("INV-"+System.currentTimeMillis());
         customerDetails.setPurchasedDate(dateFormatter(customerDetails.getPurchasedDate()));
         customerDetails.getProductsPurchasedList().stream().forEach(productsPurchased -> productsPurchased.setCustomerDetails(customerDetails));
@@ -49,7 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             Date date = dateFormat.parse(dateStr);
             return String.valueOf(date.getTime());
-        } catch (ParseException e) {
+        } catch (Exception e) {
             return String.valueOf(System.currentTimeMillis());
         }
 

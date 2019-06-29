@@ -40,6 +40,17 @@ public class Product {
     @Column(name = "vendor_name")
     private String vendorName;
 
+    @Column(name = "created_by")
+    private String createdBy;
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public String getId() {
         return id;
     }

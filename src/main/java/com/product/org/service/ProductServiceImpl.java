@@ -1,6 +1,9 @@
 package com.product.org.service;
 
+import com.product.org.model.JwtAuthenticationToken;
 import com.product.org.model.Product;
+import com.product.org.security.JwtAuthenticationProvider;
+import com.product.org.security.JwtValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.product.org.repository.ProductRepo;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Product Already Exists");
         }
         try {
+            product.setCreatedBy(JwtValidator.validate(JwtAuthenticationToken.getToken()).getUserId());
             productRepo.add(product);
             return true;
         } catch (Exception e) {
@@ -41,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductByNumber(String productSerialNumber) {
-        return productRepo.getByNumber(productSerialNumber);
+        return productRepo.getByNumber(productSerialNumber, JwtValidator.validate(JwtAuthenticationToken.getToken()).getUserId());
     }
 
     @Override

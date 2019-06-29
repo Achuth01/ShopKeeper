@@ -17,19 +17,14 @@ import java.util.List;
 @Component
 public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-    @Autowired
-    private JwtValidator jwtValidator;
-
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-
     }
-
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         String token = jwtAuthenticationToken.getToken();
-        JwtUser jwtUser = jwtValidator.validate(token);
+        JwtUser jwtUser = JwtValidator.validate(token);
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(jwtUser.getRole());
         return new JwtUserDetails(jwtUser.getUserName(),jwtUser.getUserId(),token,grantedAuthorities);
     }
@@ -38,4 +33,5 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
     public boolean supports(Class<?> authentication) {
         return JwtAuthenticationToken.class.isAssignableFrom(authentication);
     }
+
 }
